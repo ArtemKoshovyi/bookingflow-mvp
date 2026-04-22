@@ -26,8 +26,15 @@ function clearMessage() {
     messageBox.innerHTML = "";
 }
 
-function formatDateTime(utcString) {
-    return new Date(utcString).toLocaleString();
+function formatDateTime(dateString) {
+    if (!dateString) return "";
+
+    const normalized =
+        /Z$|[+\-]\d{2}:\d{2}$/.test(dateString)
+            ? dateString
+            : `${dateString}Z`;
+
+    return new Date(normalized).toLocaleString("pl-PL");
 }
 
 async function loadWorkers() {

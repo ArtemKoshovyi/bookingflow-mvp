@@ -51,28 +51,29 @@ public class BookingsController : ControllerBase
         return Ok(slots);
     }
 
-    [HttpGet]
-    public async Task<IActionResult> GetBookings()
-    {
-        var bookings = await _context.Bookings
-            .Include(b => b.Worker)
-            .Include(b => b.Service)
-            .OrderBy(b => b.StartTimeUtc)
-            .Select(b => new
-            {
-                b.Id,
-                b.ClientName,
-                b.ClientEmail,
-                b.ClientPhone,
-                WorkerName = b.Worker!.Name,
-                ServiceName = b.Service!.Name,
-                b.StartTimeUtc,
-                b.EndTimeUtc
-            })
-            .ToListAsync();
+    
+        [HttpGet]
+        public async Task<IActionResult> GetBookings()
+        {
+            var bookings = await _context.Bookings
+                .Include(b => b.Worker)
+                .Include(b => b.Service)
+                .OrderBy(b => b.StartTimeUtc)
+                .Select(b => new
+                {
+                    b.Id,
+                    b.ClientName,
+                    b.ClientEmail,
+                    b.ClientPhone,
+                    WorkerName = b.Worker!.Name,
+                    ServiceName = b.Service!.Name,
+                    StartTimeUtc = DateTime.SpecifyKind(b.StartTimeUtc, DateTimeKind.Utc),
+                    EndTimeUtc = DateTime.SpecifyKind(b.EndTimeUtc, DateTimeKind.Utc)
+                })
+                .ToListAsync();
 
-        return Ok(bookings);
-    }
+            return Ok(bookings);
+        }
 
     [HttpDelete("{id}")]
     public async Task<IActionResult> DeleteBooking(int id)
