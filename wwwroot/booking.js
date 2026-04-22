@@ -76,9 +76,13 @@ async function loadServices(workerId) {
         serviceSelect.innerHTML = `<option value="">Wybierz usługę</option>`;
 
         services.forEach((service) => {
-            const option = document.createElement("option");
-            option.value = service.id;
-            option.textContent = `${service.name} • ${service.durationMinutes} min • ${service.price}`;
+                        const option = document.createElement("option");
+                        option.value = service.id;
+            const priceText = service.price === 0 
+                ? "Za darmo" 
+                : `${service.price} zł`;
+
+            option.textContent = `${service.name} • ${service.durationMinutes} min • ${priceText}`;
             serviceSelect.appendChild(option);
         });
 
@@ -189,7 +193,20 @@ async function createBooking() {
             return;
         }
 
-        showMessage("Rezerwacja została utworzona.");
+            // скрываем форму
+            document.querySelector(".public-panel").style.display = "none";
+
+            // показываем success
+            document.getElementById("successView").style.display = "block";
+
+            // заполняем данные
+            document.getElementById("successDate").textContent = formatDateTime(selectedSlotUtc);
+
+            const selectedService = serviceSelect.options[serviceSelect.selectedIndex].text;
+            const selectedWorker = workerSelect.options[workerSelect.selectedIndex].text;
+
+            document.getElementById("successService").textContent = selectedService;
+            document.getElementById("successWorker").textContent = selectedWorker;
 
         clientNameInput.value = "";
         clientEmailInput.value = "";

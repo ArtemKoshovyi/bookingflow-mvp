@@ -36,6 +36,7 @@ const adminClientEmailInput = document.getElementById("adminClientEmail");
 const adminClientPhoneInput = document.getElementById("adminClientPhone");
 const adminCreateBookingBtn = document.getElementById("adminCreateBookingBtn");
 
+let lastBookingCount = 0;
 let allBookings = [];
 let allWorkers = [];
 let allServices = [];
@@ -150,6 +151,10 @@ async function loadBookings() {
 
     allBookings = await response.json();
     renderBookings();
+    if (lastBookingCount !== 0 && allBookings.length > lastBookingCount) {
+    showMessage("Nowa rezerwacja 🔔");
+    }
+    lastBookingCount = allBookings.length;
 }
 
 async function reloadAllData() {
@@ -254,7 +259,7 @@ function renderServices() {
         <tr>
             <td>${escapeHtml(service.name)}</td>
             <td>${service.durationMinutes} min</td>
-            <td>${service.price}</td>
+            <td>${service.price === 0 ? "Za darmo" : service.price + " zł"}</td>
             <td>${escapeHtml(service.workerName)}</td>
             <td>
                 <button class="table-action-btn danger-btn" data-service-id="${service.id}">
@@ -652,6 +657,11 @@ async function init() {
     } catch {
         showMessage("Nie udało się uruchomić panelu administratora.", true);
     }
+    setInterval(async () => {
+    try {
+        await loadBookings();
+    } catch {}
+}, 10000);
 }
 
 init();

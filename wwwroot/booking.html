@@ -86,6 +86,22 @@
                 </div>
             </div>
         </section>
+        <section id="successView" style="display:none;" class="panel public-panel">
+            <div class="panel-header">
+                <h2>Rezerwacja potwierdzona ✅</h2>
+                <p>Twoja wizyta została zapisana</p>
+            </div>
+
+            <div class="form-grid">
+                <p><strong>Termin:</strong> <span id="successDate"></span></p>
+                <p><strong>Usługa:</strong> <span id="successService"></span></p>
+                <p><strong>Pracownik:</strong> <span id="successWorker"></span></p>
+
+                <button onclick="location.reload()" class="primary-btn">
+                    Nowa rezerwacja
+                </button>
+            </div>
+        </section>
     </main>
 
     <script src="booking.js"></script>
