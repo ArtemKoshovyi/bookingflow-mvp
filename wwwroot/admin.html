@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Panel administracyjny</title>
+    <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+    <div class="app-shell">
+        <aside class="sidebar">
+            <div class="brand">
+                <div class="brand-logo">B</div>
+                <div>
+                    <h1>BookingFlow</h1>
+                    <p>Panel administratora</p>
+                </div>
+            </div>
+
+            <nav class="nav">
+                <button class="nav-link active" data-view="bookingsView">Rezerwacje</button>
+                <button class="nav-link" data-view="workersView">Pracownicy</button>
+                <button class="nav-link" data-view="servicesView">Usługi</button>
+            </nav>
+
+            <div class="sidebar-footer">
+                <p>Wersja testowa</p>
+                <span>Zarządzanie rezerwacjami</span>
+            </div>
+        </aside>
+
+        <main class="main-content">
+            <header class="topbar">
+                <div>
+                    <h2 id="pageTitle">Rezerwacje</h2>
+                    <p id="pageSubtitle">Przeglądaj, twórz i zarządzaj rezerwacjami</p>
+                </div>
+                <div class="topbar-actions">
+                    <button id="reloadDataBtn" class="secondary-btn">Odśwież dane</button>
+                    <button id="logoutBtn" class="secondary-btn">Wyloguj</button>
+                </div>
+            </header>
+
+            <section id="messageBox"></section>
+
+            <section id="bookingsView" class="view active">
+                <div class="panel">
+                    <div class="panel-header">
+                        <h3>Dodaj rezerwację</h3>
+                        <p>Administrator może dodać rezerwację ręcznie</p>
+                    </div>
+
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="adminWorkerSelect">Pracownik</label>
+                            <select id="adminWorkerSelect">
+                                <option value="">Wybierz pracownika</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="adminServiceSelect">Usługa</label>
+                            <select id="adminServiceSelect" disabled>
+                                <option value="">Wybierz usługę</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="adminDateInput">Data</label>
+                            <input id="adminDateInput" type="date" />
+                        </div>
+
+                        <div class="form-group full-width">
+                            <button id="adminLoadSlotsBtn" class="primary-btn">Pokaż dostępne terminy</button>
+                        </div>
+                    </div>
+
+                    <div class="panel public-slots-panel">
+                        <div class="panel-header">
+                            <h3>Dostępne terminy</h3>
+                            <p>Wybierz wolny termin dla klienta</p>
+                        </div>
+
+                        <div id="adminSlotsContainer" class="slot-list empty-state">
+                            <p>Załaduj terminy, aby zobaczyć dostępne godziny.</p>
+                        </div>
+                    </div>
+
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="adminClientName">Imię i nazwisko klienta</label>
+                            <input id="adminClientName" type="text" placeholder="Wpisz imię i nazwisko klienta" />
+                        </div>
+
+                        <div class="form-group">
+                            <label for="adminClientEmail">Email klienta (opcjonalnie)</label>
+                            <input id="adminClientEmail" type="email" placeholder="Wpisz email klienta" />
+                        </div>
+
+                        <div class="form-group">
+                            <label for="adminClientPhone">Telefon klienta</label>
+                            <input id="adminClientPhone" type="text" placeholder="Wpisz numer telefonu klienta" />
+                        </div>
+
+                        <div class="form-group full-width">
+                            <div class="selected-slot-box">
+                                <span class="slot-label">Wybrany termin</span>
+                                <strong id="adminSelectedSlotText">Nie wybrano terminu</strong>
+                            </div>
+                        </div>
+
+                        <div class="form-group full-width">
+                            <button id="adminCreateBookingBtn" class="success-btn">Utwórz rezerwację</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="panel">
+                    <div class="panel-header panel-header-row">
+                        <div>
+                            <h3>Lista rezerwacji</h3>
+                            <p>Filtruj i anuluj rezerwacje</p>
+                        </div>
+                    </div>
+
+                    <div class="filter-bar">
+                        <div class="form-group small">
+                            <label for="bookingDateFilter">Filtruj po dacie</label>
+                            <input id="bookingDateFilter" type="date" />
+                        </div>
+
+                        <div class="filter-actions">
+                            <button id="todayFilterBtn" class="secondary-btn">Dzisiaj</button>
+                            <button id="clearFilterBtn" class="secondary-btn">Wyczyść filtr</button>
+                        </div>
+                    </div>
+
+                    <div class="table-wrapper">
+                        <table class="bookings-table">
+                            <thead>
+                                <tr>
+                                    <th>Klient</th>
+                                    <th>Email</th>
+                                    <th>Telefon</th>
+                                    <th>Pracownik</th>
+                                    <th>Usługa</th>
+                                    <th>Początek</th>
+                                    <th>Koniec</th>
+                                    <th>Akcje</th>
+                                </tr>
+                            </thead>
+                            <tbody id="bookingsTableBody">
+                                <tr>
+                                    <td colspan="8" class="empty-row">Brak rezerwacji.</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <section id="workersView" class="view">
+                <div class="grid-layout single-grid">
+                    <div class="panel">
+                        <div class="panel-header">
+                            <h3>Dodaj pracownika</h3>
+                            <p>Utwórz nowego pracownika w systemie</p>
+                        </div>
+
+                        <div class="form-grid">
+                            <div class="form-group full-width">
+                                <label for="workerNameInput">Imię pracownika</label>
+                                <input id="workerNameInput" type="text" placeholder="Wpisz imię pracownika" />
+                            </div>
+
+                            <div class="form-group full-width">
+                                <button id="createWorkerBtn" class="success-btn">Dodaj pracownika</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="panel">
+                        <div class="panel-header">
+                            <h3>Pracownicy</h3>
+                            <p>Lista pracowników w systemie</p>
+                        </div>
+
+                        <div class="table-wrapper">
+                            <table class="bookings-table">
+                                <thead>
+                                    <tr>
+                                        <th>Imię</th>
+                                        <th>Akcje</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="workersTableBody">
+                                    <tr>
+                                        <td colspan="2" class="empty-row">Brak pracowników.</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="servicesView" class="view">
+                <div class="grid-layout single-grid">
+                    <div class="panel">
+                        <div class="panel-header">
+                            <h3>Dodaj usługę</h3>
+                            <p>Utwórz nową usługę i przypisz ją do pracownika</p>
+                        </div>
+
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label for="serviceNameInput">Nazwa usługi</label>
+                                <input id="serviceNameInput" type="text" placeholder="Wpisz nazwę usługi" />
+                            </div>
+
+                            <div class="form-group">
+                                <label for="serviceDurationInput">Czas trwania (minuty)</label>
+                                <input id="serviceDurationInput" type="number" min="1" placeholder="60" />
+                            </div>
+
+                            <div class="form-group">
+                                <label for="servicePriceInput">Cena</label>
+                                <input id="servicePriceInput" type="number" min="0" step="0.01" placeholder="80" />
+                            </div>
+
+                            <div class="form-group">
+                                <label for="serviceWorkerSelect">Pracownik</label>
+                                <select id="serviceWorkerSelect">
+                                    <option value="">Wybierz pracownika</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group full-width">
+                                <button id="createServiceBtn" class="success-btn">Dodaj usługę</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="panel">
+                        <div class="panel-header">
+                            <h3>Usługi</h3>
+                            <p>Lista usług w systemie</p>
+                        </div>
+
+                        <div class="table-wrapper">
+                            <table class="bookings-table">
+                                <thead>
+                                    <tr>
+                                        <th>Nazwa</th>
+                                        <th>Czas trwania</th>
+                                        <th>Cena</th>
+                                        <th>Pracownik</th>
+                                        <th>Akcje</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="servicesTableBody">
+                                    <tr>
+                                        <td colspan="5" class="empty-row">Brak usług.</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script src="admin.js"></script>
+</body>
+</html>

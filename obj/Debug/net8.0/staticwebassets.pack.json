@@ -1,0 +1,57 @@
+{
+  "Files": [
+    {
+      "Id": "C:\\Users\\kosov\\Desktop\\BookingApp\\wwwroot\\admin.html",
+      "PackagePath": "staticwebassets\\admin.html"
+    },
+    {
+      "Id": "C:\\Users\\kosov\\Desktop\\BookingApp\\wwwroot\\admin.js",
+      "PackagePath": "staticwebassets\\admin.js"
+    },
+    {
+      "Id": "C:\\Users\\kosov\\Desktop\\BookingApp\\wwwroot\\app.js",
+      "PackagePath": "staticwebassets\\app.js"
+    },
+    {
+      "Id": "C:\\Users\\kosov\\Desktop\\BookingApp\\wwwroot\\booking.html",
+      "PackagePath": "staticwebassets\\booking.html"
+    },
+    {
+      "Id": "C:\\Users\\kosov\\Desktop\\BookingApp\\wwwroot\\booking.js",
+      "PackagePath": "staticwebassets\\booking.js"
+    },
+    {
+      "Id": "C:\\Users\\kosov\\Desktop\\BookingApp\\wwwroot\\index.html",
+      "PackagePath": "staticwebassets\\index.html"
+    },
+    {
+      "Id": "C:\\Users\\kosov\\Desktop\\BookingApp\\wwwroot\\login.html",
+      "PackagePath": "staticwebassets\\login.html"
+    },
+    {
+      "Id": "C:\\Users\\kosov\\Desktop\\BookingApp\\wwwroot\\login.js",
+      "PackagePath": "staticwebassets\\login.js"
+    },
+    {
+      "Id": "C:\\Users\\kosov\\Desktop\\BookingApp\\wwwroot\\styles.css",
+      "PackagePath": "staticwebassets\\styles.css"
+    },
+    {
+      "Id": "obj\\Debug\\net8.0\\staticwebassets\\msbuild.BookingApp.Microsoft.AspNetCore.StaticWebAssets.props",
+      "PackagePath": "build\\Microsoft.AspNetCore.StaticWebAssets.props"
+    },
+    {
+      "Id": "obj\\Debug\\net8.0\\staticwebassets\\msbuild.build.BookingApp.props",
+      "PackagePath": "build\\BookingApp.props"
+    },
+    {
+      "Id": "obj\\Debug\\net8.0\\staticwebassets\\msbuild.buildMultiTargeting.BookingApp.props",
+      "PackagePath": "buildMultiTargeting\\BookingApp.props"
+    },
+    {
+      "Id": "obj\\Debug\\net8.0\\staticwebassets\\msbuild.buildTransitive.BookingApp.props",
+      "PackagePath": "buildTransitive\\BookingApp.props"
+    }
+  ],
+  "ElementsToRemove": []
+}

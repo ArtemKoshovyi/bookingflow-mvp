@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Rezerwacja wizyty</title>
+    <link rel="stylesheet" href="styles.css" />
+</head>
+<body class="public-page">
+    <main class="public-wrapper">
+        <section class="public-hero">
+            <div class="public-brand">BookingFlow</div>
+            <h1>Zarezerwuj wizytę</h1>
+            <p>Wybierz pracownika, usługę i dostępny termin.</p>
+        </section>
+
+        <section class="panel public-panel">
+            <div class="panel-header">
+                <h3>Formularz rezerwacji</h3>
+                <p>Uzupełnij dane i wybierz dogodny termin</p>
+            </div>
+
+            <section id="messageBox"></section>
+
+            <div class="form-grid">
+                <div class="form-group">
+                    <label for="workerSelect">Pracownik</label>
+                    <select id="workerSelect">
+                        <option value="">Wybierz pracownika</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="serviceSelect">Usługa</label>
+                    <select id="serviceSelect" disabled>
+                        <option value="">Wybierz usługę</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="dateInput">Data</label>
+                    <input id="dateInput" type="date" />
+                </div>
+
+                <div class="form-group full-width">
+                    <button id="loadSlotsBtn" class="primary-btn">Pokaż dostępne terminy</button>
+                </div>
+            </div>
+
+            <div class="panel public-slots-panel">
+                <div class="panel-header">
+                    <h3>Dostępne terminy</h3>
+                    <p>Wybierz dogodną godzinę</p>
+                </div>
+
+                <div id="slotsContainer" class="slot-list empty-state">
+                    <p>Najpierw załaduj dostępne terminy.</p>
+                </div>
+            </div>
+
+            <div class="form-grid">
+                <div class="form-group">
+                    <label for="clientName">Imię i nazwisko</label>
+                    <input id="clientName" type="text" placeholder="Wpisz swoje imię" />
+                </div>
+
+                <div class="form-group">
+                    <label for="clientEmail">Email (opcjonalnie)</label>
+                    <input id="clientEmail" type="email" placeholder="Wpisz email" />
+                </div>
+
+                <div class="form-group">
+                    <label for="clientPhone">Telefon</label>
+                    <input id="clientPhone" type="text" placeholder="Wpisz numer telefonu" />
+                </div>
+
+                <div class="form-group full-width">
+                    <div class="selected-slot-box">
+                        <span class="slot-label">Wybrany termin</span>
+                        <strong id="selectedSlotText">Nie wybrano terminu</strong>
+                    </div>
+                </div>
+
+                <div class="form-group full-width">
+                    <button id="createBookingBtn" class="success-btn">Zarezerwuj</button>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script src="booking.js"></script>
+</body>
+</html>
