@@ -1,4 +1,4 @@
-const apiBase = "http://localhost:5009";
+const apiBase = window.location.origin;
 
 const messageBox = document.getElementById("messageBox");
 const logoutBtn = document.getElementById("logoutBtn");

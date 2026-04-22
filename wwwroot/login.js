@@ -1,4 +1,4 @@
-const apiBase = "http://localhost:5009";
+const apiBase = window.location.origin;
 
 const usernameInput = document.getElementById("usernameInput");
 const passwordInput = document.getElementById("passwordInput");

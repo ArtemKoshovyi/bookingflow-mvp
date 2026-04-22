@@ -1,4 +1,4 @@
-const apiBase = "http://localhost:5009";
+const apiBase = window.location.origin;
 
 const workerSelect = document.getElementById("workerSelect");
 const serviceSelect = document.getElementById("serviceSelect");
