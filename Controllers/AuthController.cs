@@ -36,7 +36,8 @@ public class AuthController : ControllerBase
             message = "Login successful.",
             businessId = business.Id,
             businessName = business.Name,
-            slug = business.Slug
+            slug = business.Slug,
+            username = business.Username
         });
     }
 }

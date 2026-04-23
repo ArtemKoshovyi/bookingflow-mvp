@@ -17,6 +17,14 @@ function clearMessage() {
     messageBox.innerHTML = "";
 }
 
+function clearAdminStorage() {
+    localStorage.removeItem("adminLoggedIn");
+    localStorage.removeItem("adminUsername");
+    localStorage.removeItem("businessId");
+    localStorage.removeItem("businessSlug");
+    localStorage.removeItem("businessName");
+}
+
 async function login() {
     clearMessage();
 
@@ -37,17 +45,29 @@ async function login() {
             body: JSON.stringify({ username, password })
         });
 
-        const data = await response.json();
+        let data = null;
+        try {
+            data = await response.json();
+        } catch {
+            data = null;
+        }
 
         if (!response.ok) {
-            showMessage(data.message || "Logowanie nie powiodło się.", true);
+            showMessage(data?.message || "Logowanie nie powiodło się.", true);
             return;
         }
 
+        if (!data || !data.businessId) {
+            showMessage("Serwer nie zwrócił businessId.", true);
+            return;
+        }
+
+        clearAdminStorage();
+
         localStorage.setItem("adminLoggedIn", "true");
-        localStorage.setItem("adminUsername", username);
-        localStorage.setItem("businessId", data.businessId);
-        localStorage.setItem("businessSlug", data.slug);
+        localStorage.setItem("adminUsername", data.username ?? username);
+        localStorage.setItem("businessId", String(data.businessId));
+        localStorage.setItem("businessSlug", data.slug ?? "");
         localStorage.setItem("businessName", data.businessName ?? "");
 
         window.location.href = "/admin.html";

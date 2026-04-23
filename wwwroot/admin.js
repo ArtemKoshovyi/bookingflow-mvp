@@ -1,11 +1,16 @@
 const apiBase = window.location.origin;
 
-const businessId = localStorage.getItem("businessId");
+function getBusinessId() {
+    return localStorage.getItem("businessId");
+}
 
 function getHeaders(includeJson = true) {
-    const headers = {
-        "X-Business-Id": businessId
-    };
+    const businessId = getBusinessId();
+    const headers = {};
+
+    if (businessId) {
+        headers["X-Business-Id"] = businessId;
+    }
 
     if (includeJson) {
         headers["Content-Type"] = "application/json";
@@ -13,7 +18,6 @@ function getHeaders(includeJson = true) {
 
     return headers;
 }
-
 const messageBox = document.getElementById("messageBox");
 const logoutBtn = document.getElementById("logoutBtn");
 const reloadDataBtn = document.getElementById("reloadDataBtn");
