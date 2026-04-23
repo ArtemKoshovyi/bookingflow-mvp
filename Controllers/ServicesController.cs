@@ -44,37 +44,51 @@ public class ServicesController : ControllerBase
         return Ok(services);
     }
 
-    [HttpPost]
-    public async Task<IActionResult> CreateService([FromBody] CreateServiceRequest request)
+ [HttpPost]
+public async Task<IActionResult> CreateService([FromBody] CreateServiceRequest request)
+{
+    if (!ModelState.IsValid)
     {
-        if (!ModelState.IsValid)
-        {
-            return ValidationProblem(ModelState);
-        }
-
-        var workerExists = await _context.Workers.AnyAsync(w => w.Id == request.WorkerId);
-        if (!workerExists)
-        {
-            return BadRequest(new { message = "Selected worker does not exist." });
-        }
-
-        var service = new Service
-        {
-            Name = request.Name,
-            DurationMinutes = request.DurationMinutes,
-            Price = request.Price,
-            WorkerId = request.WorkerId
-        };
-
-        _context.Services.Add(service);
-        await _context.SaveChangesAsync();
-
-        return Ok(new
-        {
-            message = "Service created successfully.",
-            service.Id
-        });
+        return ValidationProblem(ModelState);
     }
+
+    var businessIdHeader = Request.Headers["X-Business-Id"].FirstOrDefault();
+    if (string.IsNullOrWhiteSpace(businessIdHeader))
+    {
+        return BadRequest(new { message = "Missing BusinessId header." });
+    }
+
+    if (!int.TryParse(businessIdHeader, out var businessId))
+    {
+        return BadRequest(new { message = "Invalid BusinessId header." });
+    }
+
+    var worker = await _context.Workers
+        .FirstOrDefaultAsync(w => w.Id == request.WorkerId && w.BusinessId == businessId);
+
+    if (worker == null)
+    {
+        return BadRequest(new { message = "Selected worker does not exist in this business." });
+    }
+
+    var service = new Service
+    {
+        Name = request.Name,
+        DurationMinutes = request.DurationMinutes,
+        Price = request.Price,
+        WorkerId = request.WorkerId,
+        BusinessId = businessId
+    };
+
+    _context.Services.Add(service);
+    await _context.SaveChangesAsync();
+
+    return Ok(new
+    {
+        message = "Service created successfully.",
+        service.Id
+    });
+}
 
     [HttpDelete("{id}")]
     public async Task<IActionResult> DeleteService(int id)

@@ -10,7 +10,7 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseSqlite("Data Source=booking.db"));
+    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 builder.Services.AddScoped<BookingService>();
 
@@ -40,59 +40,41 @@ using (var scope = app.Services.CreateScope())
     var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
     context.Database.Migrate();
 
-    // 👉 ДОБАВЛЯЕМ БИЗНЕС
-    if (!context.Businesses.Any())
+    if (!context.Businesses.Any(b => b.Username == "admin"))
     {
-        var business = new Business
+        context.Businesses.Add(new Business
         {
             Name = "Test Barber",
             Slug = "barber",
             Username = "admin",
             Password = "1234"
-        };
+        });
 
-        context.Businesses.Add(business);
         context.SaveChanges();
     }
 
-    // 👉 получаем бизнес
-    var firstBusiness = context.Businesses.First();
-
-    // 👉 теперь создаём работников
-    if (!context.Workers.Any())
+    if (!context.Businesses.Any(b => b.Username == "anna"))
     {
-        var worker1 = new Worker { Name = "Artem", BusinessId = firstBusiness.Id };
-        var worker2 = new Worker { Name = "Andrii", BusinessId = firstBusiness.Id };
+        context.Businesses.Add(new Business
+        {
+            Name = "Studio Anna",
+            Slug = "anna",
+            Username = "anna",
+            Password = "1234"
+        });
 
-        context.Workers.AddRange(worker1, worker2);
         context.SaveChanges();
+    }
 
-        context.Services.AddRange(
-            new Service
-            {
-                Name = "Haircut",
-                DurationMinutes = 60,
-                Price = 80,
-                WorkerId = worker1.Id,
-                BusinessId = firstBusiness.Id
-            },
-            new Service
-            {
-                Name = "Beard Trim",
-                DurationMinutes = 30,
-                Price = 40,
-                WorkerId = worker1.Id,
-                BusinessId = firstBusiness.Id
-            },
-            new Service
-            {
-                Name = "Consultation",
-                DurationMinutes = 45,
-                Price = 100,
-                WorkerId = worker2.Id,
-                BusinessId = firstBusiness.Id
-            }
-        );
+    if (!context.Businesses.Any(b => b.Username == "artem"))
+    {
+        context.Businesses.Add(new Business
+        {
+            Name = "Studio Artem",
+            Slug = "artem",
+            Username = "artem",
+            Password = "1234"
+        });
 
         context.SaveChanges();
     }

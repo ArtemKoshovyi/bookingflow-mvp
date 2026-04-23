@@ -23,7 +23,7 @@ public class BookingService
         }
 
         var service = await _context.Services
-            .FirstOrDefaultAsync(s => s.Id == request.ServiceId && s.WorkerId == request.WorkerId);
+            .FirstOrDefaultAsync(s => s.Id == request.ServiceId && s.WorkerId == request.WorkerId && s.BusinessId == worker.BusinessId);
 
         if (service is null)
         {
@@ -56,15 +56,16 @@ public class BookingService
         }
 
         var booking = new Booking
-        {
-            ClientName = request.ClientName,
-            ClientEmail = request.ClientEmail,
-            ClientPhone = request.ClientPhone,
-            WorkerId = request.WorkerId,
-            ServiceId = request.ServiceId,
-            StartTimeUtc = start,
-            EndTimeUtc = end
-        };
+            {
+                ClientName = request.ClientName,
+                ClientEmail = request.ClientEmail,
+                ClientPhone = request.ClientPhone,
+                WorkerId = request.WorkerId,
+                ServiceId = request.ServiceId,
+                StartTimeUtc = start,
+                EndTimeUtc = end,
+                BusinessId = worker.BusinessId
+            };
 
         _context.Bookings.Add(booking);
         await _context.SaveChangesAsync();

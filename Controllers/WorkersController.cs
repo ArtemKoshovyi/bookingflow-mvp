@@ -40,28 +40,46 @@ public async Task<IActionResult> GetWorkers()
 }
 
     [HttpPost]
-    public async Task<IActionResult> CreateWorker([FromBody] CreateWorkerRequest request)
+public async Task<IActionResult> CreateWorker([FromBody] CreateWorkerRequest request)
+{
+    if (!ModelState.IsValid)
     {
-        if (!ModelState.IsValid)
-        {
-            return ValidationProblem(ModelState);
-        }
-
-        var worker = new Worker
-        {
-            Name = request.Name
-        };
-
-        _context.Workers.Add(worker);
-        await _context.SaveChangesAsync();
-
-        return Ok(new
-        {
-            message = "Worker created successfully.",
-            worker.Id,
-            worker.Name
-        });
+        return ValidationProblem(ModelState);
     }
+
+    var businessIdHeader = Request.Headers["X-Business-Id"].FirstOrDefault();
+    if (string.IsNullOrWhiteSpace(businessIdHeader))
+    {
+        return BadRequest(new { message = "Missing BusinessId header." });
+    }
+
+    if (!int.TryParse(businessIdHeader, out var businessId))
+    {
+        return BadRequest(new { message = "Invalid BusinessId header." });
+    }
+
+    var businessExists = await _context.Businesses.AnyAsync(b => b.Id == businessId);
+    if (!businessExists)
+    {
+        return BadRequest(new { message = "Business not found." });
+    }
+
+    var worker = new Worker
+    {
+        Name = request.Name,
+        BusinessId = businessId
+    };
+
+    _context.Workers.Add(worker);
+    await _context.SaveChangesAsync();
+
+    return Ok(new
+    {
+        message = "Worker created successfully.",
+        worker.Id,
+        worker.Name
+    });
+}
 
     [HttpDelete("{id}")]
     public async Task<IActionResult> DeleteWorker(int id)
@@ -88,20 +106,28 @@ public async Task<IActionResult> GetWorkers()
     }
 
     [HttpGet("{workerId}/services")]
-    public async Task<IActionResult> GetWorkerServices(int workerId)
-    {
-        var services = await _context.Services
-            .Where(s => s.WorkerId == workerId)
-            .Select(s => new
-            {
-                s.Id,
-                s.Name,
-                s.DurationMinutes,
-                s.Price,
-                s.WorkerId
-            })
-            .ToListAsync();
+public async Task<IActionResult> GetWorkerServices(int workerId)
+{
+    var businessIdHeader = Request.Headers["X-Business-Id"].FirstOrDefault();
 
-        return Ok(services);
-    }
+    if (string.IsNullOrWhiteSpace(businessIdHeader))
+        return BadRequest(new { message = "Missing BusinessId header." });
+
+    if (!int.TryParse(businessIdHeader, out var businessId))
+        return BadRequest(new { message = "Invalid BusinessId header." });
+
+    var services = await _context.Services
+        .Where(s => s.WorkerId == workerId && s.BusinessId == businessId)
+        .Select(s => new
+        {
+            s.Id,
+            s.Name,
+            s.DurationMinutes,
+            s.Price,
+            s.WorkerId
+        })
+        .ToListAsync();
+
+    return Ok(services);
+}
 }
