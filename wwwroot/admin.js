@@ -1,16 +1,22 @@
 const apiBase = window.location.origin;
 
-function getBusinessId() {
-    return localStorage.getItem("businessId");
+function getBusinessIdOrRedirect() {
+    const id = localStorage.getItem("businessId");
+
+    if (!id) {
+        window.location.href = "/login.html";
+        throw new Error("No businessId");
+    }
+
+    return id;
 }
 
 function getHeaders(includeJson = true) {
-    const businessId = getBusinessId();
-    const headers = {};
+    const businessId = getBusinessIdOrRedirect();
 
-    if (businessId) {
-        headers["X-Business-Id"] = businessId;
-    }
+    const headers = {
+        "X-Business-Id": businessId
+    };
 
     if (includeJson) {
         headers["Content-Type"] = "application/json";
@@ -66,7 +72,10 @@ function ensureAdminAuth() {
 
     if (isLoggedIn !== "true" || !storedBusinessId) {
         window.location.href = "/login.html";
+        return false;
     }
+
+    return true;
 }
 
 function logout() {
@@ -692,7 +701,8 @@ navLinks.forEach(link => {
 });
 
 async function init() {
-    ensureAdminAuth();
+    if (!ensureAdminAuth()) return;
+
     setDefaultAdminDate();
 
     try {
