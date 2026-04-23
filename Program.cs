@@ -53,13 +53,13 @@ using (var scope = app.Services.CreateScope())
         context.SaveChanges();
     }
 
-    if (!context.Businesses.Any(b => b.Username == "lokal"))
+    if (!context.Businesses.Any(b => b.Username == "Malwa"))
     {
         context.Businesses.Add(new Business
         {
             Name = "Studio lokal",
-            Slug = "lokal",
-            Username = "lokal",
+            Slug = "Malwa",
+            Username = "Malwa",
             Password = "1234"
         });
 
