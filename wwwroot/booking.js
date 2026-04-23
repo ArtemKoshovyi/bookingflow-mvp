@@ -19,6 +19,10 @@ const createBookingBtn = document.getElementById("createBookingBtn");
 const messageBox = document.getElementById("messageBox");
 
 function getHeaders(includeJson = true) {
+    if (!businessId) {
+        throw new Error("No businessId");
+    }
+
     const headers = {
         "X-Business-Id": businessId
     };
@@ -285,7 +289,14 @@ function setDefaultDate() {
 async function init() {
     try {
         setDefaultDate();
+
         await loadBusiness();
+
+        if (!businessId) {
+            showMessage("Błąd: nie znaleziono firmy.", true);
+            return;
+        }
+
         await loadWorkers();
     } catch {
         showMessage("Nie udało się załadować strony rezerwacji.", true);
