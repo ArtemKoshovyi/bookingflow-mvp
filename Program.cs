@@ -40,39 +40,51 @@ using (var scope = app.Services.CreateScope())
     var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
     context.Database.Migrate();
 
-    if (!context.Businesses.Any(b => b.Username == "admin"))
+    if (!context.Businesses.Any(b => b.Username == "fryzjer"))
     {
         context.Businesses.Add(new Business
         {
             Name = "Test Barber",
-            Slug = "barber",
-            Username = "admin",
+            Slug = "fryzjer",
+            Username = "fryzjer",
             Password = "1234"
         });
 
         context.SaveChanges();
     }
 
-    if (!context.Businesses.Any(b => b.Username == "anna"))
+    if (!context.Businesses.Any(b => b.Username == "lokal"))
     {
         context.Businesses.Add(new Business
         {
-            Name = "Studio Anna",
-            Slug = "anna",
-            Username = "anna",
+            Name = "Studio lokal",
+            Slug = "lokal",
+            Username = "lokal",
             Password = "1234"
         });
 
         context.SaveChanges();
     }
 
-    if (!context.Businesses.Any(b => b.Username == "artem"))
+    if (!context.Businesses.Any(b => b.Username == "uroda"))
     {
         context.Businesses.Add(new Business
         {
-            Name = "Studio Artem",
-            Slug = "artem",
-            Username = "artem",
+            Name = "Studio uroda",
+            Slug = "uroda",
+            Username = "uroda",
+            Password = "1234"
+        });
+
+        context.SaveChanges();
+    }
+    if (!context.Businesses.Any(b => b.Username == "kwiatek"))
+    {
+        context.Businesses.Add(new Business
+        {
+            Name = "Studio kwiatek",
+            Slug = "kwiatek",
+            Username = "kwiatek",
             Password = "1234"
         });
 
