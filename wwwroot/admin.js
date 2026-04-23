@@ -1,5 +1,19 @@
 const apiBase = window.location.origin;
 
+const businessId = localStorage.getItem("businessId");
+
+function getHeaders(includeJson = true) {
+    const headers = {
+        "X-Business-Id": businessId
+    };
+
+    if (includeJson) {
+        headers["Content-Type"] = "application/json";
+    }
+
+    return headers;
+}
+
 const messageBox = document.getElementById("messageBox");
 const logoutBtn = document.getElementById("logoutBtn");
 const reloadDataBtn = document.getElementById("reloadDataBtn");
@@ -44,7 +58,9 @@ let adminSelectedSlotUtc = null;
 
 function ensureAdminAuth() {
     const isLoggedIn = localStorage.getItem("adminLoggedIn");
-    if (isLoggedIn !== "true") {
+    const storedBusinessId = localStorage.getItem("businessId");
+
+    if (isLoggedIn !== "true" || !storedBusinessId) {
         window.location.href = "/login.html";
     }
 }
@@ -52,6 +68,9 @@ function ensureAdminAuth() {
 function logout() {
     localStorage.removeItem("adminLoggedIn");
     localStorage.removeItem("adminUsername");
+    localStorage.removeItem("businessId");
+    localStorage.removeItem("businessSlug");
+    localStorage.removeItem("businessName");
     window.location.href = "/login.html";
 }
 
@@ -79,7 +98,12 @@ function formatDateTime(dateString) {
 }
 
 function formatDateOnly(utcString) {
-    return new Date(utcString).toISOString().split("T")[0];
+    const normalized =
+        /Z$|[+\-]\d{2}:\d{2}$/.test(utcString)
+            ? utcString
+            : `${utcString}Z`;
+
+    return new Date(normalized).toISOString().split("T")[0];
 }
 
 function escapeHtml(value) {
@@ -122,7 +146,10 @@ function setActiveView(viewId) {
 }
 
 async function loadWorkers() {
-    const response = await fetch(`${apiBase}/api/workers`);
+    const response = await fetch(`${apiBase}/api/workers`, {
+        headers: getHeaders(false)
+    });
+
     if (!response.ok) {
         throw new Error("Nie udało się załadować pracowników");
     }
@@ -134,7 +161,10 @@ async function loadWorkers() {
 }
 
 async function loadServices() {
-    const response = await fetch(`${apiBase}/api/services`);
+    const response = await fetch(`${apiBase}/api/services`, {
+        headers: getHeaders(false)
+    });
+
     if (!response.ok) {
         throw new Error("Nie udało się załadować usług");
     }
@@ -144,16 +174,21 @@ async function loadServices() {
 }
 
 async function loadBookings() {
-    const response = await fetch(`${apiBase}/api/bookings`);
+    const response = await fetch(`${apiBase}/api/bookings`, {
+        headers: getHeaders(false)
+    });
+
     if (!response.ok) {
         throw new Error("Nie udało się załadować rezerwacji");
     }
 
     allBookings = await response.json();
     renderBookings();
+
     if (lastBookingCount !== 0 && allBookings.length > lastBookingCount) {
-    showMessage("Nowa rezerwacja 🔔");
+        showMessage("Nowa rezerwacja 🔔");
     }
+
     lastBookingCount = allBookings.length;
 }
 
@@ -312,7 +347,10 @@ async function loadAdminWorkerServices(workerId) {
         adminServiceSelect.disabled = true;
         adminServiceSelect.innerHTML = '<option value="">Ładowanie...</option>';
 
-        const response = await fetch(`${apiBase}/api/workers/${workerId}/services`);
+        const response = await fetch(`${apiBase}/api/workers/${workerId}/services`, {
+            headers: getHeaders(false)
+        });
+
         if (!response.ok) {
             throw new Error("Nie udało się załadować usług");
         }
@@ -324,7 +362,8 @@ async function loadAdminWorkerServices(workerId) {
         services.forEach(service => {
             const option = document.createElement("option");
             option.value = service.id;
-            option.textContent = `${service.name} • ${service.durationMinutes} min • ${service.price}`;
+            const priceText = service.price === 0 ? "Za darmo" : `${service.price} zł`;
+            option.textContent = `${service.name} • ${service.durationMinutes} min • ${priceText}`;
             adminServiceSelect.appendChild(option);
         });
 
@@ -353,7 +392,10 @@ async function loadAdminAvailableSlots() {
 
     try {
         const response = await fetch(
-            `${apiBase}/api/bookings/available-slots?workerId=${workerId}&serviceId=${serviceId}&dayUtc=${encodeURIComponent(dayUtc)}`
+            `${apiBase}/api/bookings/available-slots?workerId=${workerId}&serviceId=${serviceId}&dayUtc=${encodeURIComponent(dayUtc)}`,
+            {
+                headers: getHeaders(false)
+            }
         );
 
         if (!response.ok) {
@@ -422,9 +464,7 @@ async function createAdminBooking() {
     try {
         const response = await fetch(`${apiBase}/api/bookings`, {
             method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
+            headers: getHeaders(),
             body: JSON.stringify(payload)
         });
 
@@ -461,9 +501,7 @@ async function createWorker() {
     try {
         const response = await fetch(`${apiBase}/api/workers`, {
             method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
+            headers: getHeaders(),
             body: JSON.stringify({ name })
         });
 
@@ -492,7 +530,8 @@ async function deleteWorker(workerId) {
 
     try {
         const response = await fetch(`${apiBase}/api/workers/${workerId}`, {
-            method: "DELETE"
+            method: "DELETE",
+            headers: getHeaders(false)
         });
 
         const data = await response.json();
@@ -525,9 +564,7 @@ async function createService() {
     try {
         const response = await fetch(`${apiBase}/api/services`, {
             method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
+            headers: getHeaders(),
             body: JSON.stringify({
                 name,
                 durationMinutes,
@@ -565,7 +602,8 @@ async function deleteService(serviceId) {
 
     try {
         const response = await fetch(`${apiBase}/api/services/${serviceId}`, {
-            method: "DELETE"
+            method: "DELETE",
+            headers: getHeaders(false)
         });
 
         const data = await response.json();
@@ -592,7 +630,8 @@ async function deleteBooking(bookingId) {
 
     try {
         const response = await fetch(`${apiBase}/api/bookings/${bookingId}`, {
-            method: "DELETE"
+            method: "DELETE",
+            headers: getHeaders(false)
         });
 
         const data = await response.json();
@@ -657,11 +696,12 @@ async function init() {
     } catch {
         showMessage("Nie udało się uruchomić panelu administratora.", true);
     }
+
     setInterval(async () => {
-    try {
-        await loadBookings();
-    } catch {}
-}, 10000);
+        try {
+            await loadBookings();
+        } catch {}
+    }, 10000);
 }
 
 init();

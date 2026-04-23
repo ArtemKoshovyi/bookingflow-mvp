@@ -20,8 +20,16 @@ public class ServicesController : ControllerBase
     [HttpGet]
     public async Task<IActionResult> GetServices()
     {
+        var businessIdHeader = Request.Headers["X-Business-Id"].FirstOrDefault();
+
+        if (string.IsNullOrEmpty(businessIdHeader))
+            return BadRequest("Missing BusinessId");
+
+        var businessId = int.Parse(businessIdHeader);
+
         var services = await _context.Services
             .Include(s => s.Worker)
+            .Where(s => s.BusinessId == businessId)
             .Select(s => new
             {
                 s.Id,

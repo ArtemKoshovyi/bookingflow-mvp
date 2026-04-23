@@ -12,7 +12,8 @@ public class AppDbContext : DbContext
     public DbSet<Worker> Workers => Set<Worker>();
     public DbSet<Service> Services => Set<Service>();
     public DbSet<Booking> Bookings => Set<Booking>();
-
+    public DbSet<Business> Businesses => Set<Business>();
+    
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);

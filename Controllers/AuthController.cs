@@ -13,20 +13,19 @@ public class AuthController : ControllerBase
     [HttpPost("login")]
     public IActionResult Login([FromBody] LoginRequest request)
     {
-        if (!ModelState.IsValid)
-        {
-            return ValidationProblem(ModelState);
-        }
+        var business = _context.Businesses
+            .FirstOrDefault(b => b.Username == request.Username);
 
-        if (request.Username != AdminUsername || request.Password != AdminPassword)
+        if (business == null || business.Password != request.Password)
         {
-            return Unauthorized(new { message = "Invalid username or password." });
+            return Unauthorized(new { message = "Invalid credentials" });
         }
 
         return Ok(new
         {
-            message = "Login successful.",
-            username = AdminUsername
+            businessId = business.Id,
+            businessName = business.Name,
+            slug = business.Slug
         });
     }
 

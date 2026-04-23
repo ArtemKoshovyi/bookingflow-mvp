@@ -18,18 +18,26 @@ public class WorkersController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<IActionResult> GetWorkers()
-    {
-        var workers = await _context.Workers
-            .Select(w => new
-            {
-                w.Id,
-                w.Name
-            })
-            .ToListAsync();
+public async Task<IActionResult> GetWorkers()
+{
+    var businessIdHeader = Request.Headers["X-Business-Id"].FirstOrDefault();
 
-        return Ok(workers);
-    }
+    if (string.IsNullOrEmpty(businessIdHeader))
+        return BadRequest("Missing BusinessId");
+
+    var businessId = int.Parse(businessIdHeader);
+
+    var workers = await _context.Workers
+        .Where(w => w.BusinessId == businessId)
+        .Select(w => new
+        {
+            w.Id,
+            w.Name
+        })
+        .ToListAsync();
+
+    return Ok(workers);
+}
 
     [HttpPost]
     public async Task<IActionResult> CreateWorker([FromBody] CreateWorkerRequest request)

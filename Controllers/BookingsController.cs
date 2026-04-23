@@ -55,9 +55,17 @@ public class BookingsController : ControllerBase
         [HttpGet]
         public async Task<IActionResult> GetBookings()
         {
+            var businessIdHeader = Request.Headers["X-Business-Id"].FirstOrDefault();
+
+            if (string.IsNullOrEmpty(businessIdHeader))
+                return BadRequest("Missing BusinessId");
+
+            var businessId = int.Parse(businessIdHeader);
+
             var bookings = await _context.Bookings
                 .Include(b => b.Worker)
                 .Include(b => b.Service)
+                .Where(b => b.BusinessId == businessId)
                 .OrderBy(b => b.StartTimeUtc)
                 .Select(b => new
                 {

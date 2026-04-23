@@ -24,7 +24,7 @@ async function login() {
     const password = passwordInput.value.trim();
 
     if (!username || !password) {
-        showMessage("Enter username and password.", true);
+        showMessage("Wpisz login i hasło.", true);
         return;
     }
 
@@ -40,22 +40,25 @@ async function login() {
         const data = await response.json();
 
         if (!response.ok) {
-            showMessage(data.message || "Login failed.", true);
+            showMessage(data.message || "Logowanie nie powiodło się.", true);
             return;
         }
 
         localStorage.setItem("adminLoggedIn", "true");
-        localStorage.setItem("adminUsername", data.username);
+        localStorage.setItem("adminUsername", username);
+        localStorage.setItem("businessId", data.businessId);
+        localStorage.setItem("businessSlug", data.slug);
+        localStorage.setItem("businessName", data.businessName ?? "");
 
         window.location.href = "/admin.html";
-    } catch (error) {
-        showMessage("Server error during login.", true);
+    } catch {
+        showMessage("Błąd serwera podczas logowania.", true);
     }
 }
 
 loginBtn.addEventListener("click", login);
 
-passwordInput.addEventListener("keydown", (event) => {
+passwordInput.addEventListener("keydown", event => {
     if (event.key === "Enter") {
         login();
     }

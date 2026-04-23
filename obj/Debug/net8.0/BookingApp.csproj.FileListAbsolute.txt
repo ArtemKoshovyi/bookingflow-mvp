@@ -133,3 +133,4 @@ C:\Users\kosov\Desktop\BookingApp\obj\Debug\net8.0\BookingApp.pdb
 C:\Users\kosov\Desktop\BookingApp\obj\Debug\net8.0\BookingApp.genruntimeconfig.cache
 C:\Users\kosov\Desktop\BookingApp\obj\Debug\net8.0\ref\BookingApp.dll
 C:\Users\kosov\Desktop\BookingApp\bin\Debug\net8.0\BookingApp.staticwebassets.runtime.json
+C:\Users\kosov\Desktop\BookingApp\obj\Debug\net8.0\BookingApp.sourcelink.json

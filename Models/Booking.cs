@@ -25,4 +25,7 @@ public class Booking
     public DateTime EndTimeUtc { get; set; }
 
     public DateTime CreatedAtUtc { get; set; } = DateTime.UtcNow;
+
+    public int BusinessId { get; set; }
+    public Business? Business { get; set; }
 }

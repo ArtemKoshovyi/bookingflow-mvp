@@ -19,4 +19,7 @@ public class Service
 
     public int WorkerId { get; set; }
     public Worker? Worker { get; set; }
+
+    public int BusinessId { get; set; }
+    public Business? Business { get; set; }
 }

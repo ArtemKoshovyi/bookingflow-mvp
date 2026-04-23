@@ -1,5 +1,11 @@
 const apiBase = window.location.origin;
 
+let businessId = null;
+let selectedSlotUtc = null;
+
+const urlParams = new URLSearchParams(window.location.search);
+const slug = urlParams.get("slug");
+
 const workerSelect = document.getElementById("workerSelect");
 const serviceSelect = document.getElementById("serviceSelect");
 const dateInput = document.getElementById("dateInput");
@@ -12,7 +18,17 @@ const clientPhoneInput = document.getElementById("clientPhone");
 const createBookingBtn = document.getElementById("createBookingBtn");
 const messageBox = document.getElementById("messageBox");
 
-let selectedSlotUtc = null;
+function getHeaders(includeJson = true) {
+    const headers = {
+        "X-Business-Id": businessId
+    };
+
+    if (includeJson) {
+        headers["Content-Type"] = "application/json";
+    }
+
+    return headers;
+}
 
 function showMessage(text, isError = false) {
     messageBox.innerHTML = `
@@ -37,9 +53,26 @@ function formatDateTime(dateString) {
     return new Date(normalized).toLocaleString("pl-PL");
 }
 
+async function loadBusiness() {
+    if (!slug) {
+        throw new Error("Missing slug");
+    }
+
+    const response = await fetch(`${apiBase}/api/public/business/${slug}`);
+
+    if (!response.ok) {
+        throw new Error("Nie udało się załadować danych firmy");
+    }
+
+    const data = await response.json();
+    businessId = data.id;
+}
+
 async function loadWorkers() {
     try {
-        const response = await fetch(`${apiBase}/api/workers`);
+        const response = await fetch(`${apiBase}/api/workers`, {
+            headers: getHeaders(false)
+        });
 
         if (!response.ok) {
             throw new Error("Nie udało się załadować pracowników");
@@ -49,7 +82,7 @@ async function loadWorkers() {
 
         workerSelect.innerHTML = `<option value="">Wybierz pracownika</option>`;
 
-        workers.forEach((worker) => {
+        workers.forEach(worker => {
             const option = document.createElement("option");
             option.value = worker.id;
             option.textContent = worker.name;
@@ -65,7 +98,9 @@ async function loadServices(workerId) {
         serviceSelect.disabled = true;
         serviceSelect.innerHTML = `<option value="">Ładowanie...</option>`;
 
-        const response = await fetch(`${apiBase}/api/workers/${workerId}/services`);
+        const response = await fetch(`${apiBase}/api/workers/${workerId}/services`, {
+            headers: getHeaders(false)
+        });
 
         if (!response.ok) {
             throw new Error("Nie udało się załadować usług");
@@ -75,11 +110,12 @@ async function loadServices(workerId) {
 
         serviceSelect.innerHTML = `<option value="">Wybierz usługę</option>`;
 
-        services.forEach((service) => {
-                        const option = document.createElement("option");
-                        option.value = service.id;
-            const priceText = service.price === 0 
-                ? "Za darmo" 
+        services.forEach(service => {
+            const option = document.createElement("option");
+            option.value = service.id;
+
+            const priceText = service.price === 0
+                ? "Za darmo"
                 : `${service.price} zł`;
 
             option.textContent = `${service.name} • ${service.durationMinutes} min • ${priceText}`;
@@ -111,7 +147,10 @@ async function loadAvailableSlots() {
 
     try {
         const response = await fetch(
-            `${apiBase}/api/bookings/available-slots?workerId=${workerId}&serviceId=${serviceId}&dayUtc=${encodeURIComponent(dayUtc)}`
+            `${apiBase}/api/bookings/available-slots?workerId=${workerId}&serviceId=${serviceId}&dayUtc=${encodeURIComponent(dayUtc)}`,
+            {
+                headers: getHeaders(false)
+            }
         );
 
         if (!response.ok) {
@@ -129,14 +168,14 @@ async function loadAvailableSlots() {
         slotsContainer.className = "slot-list";
         slotsContainer.innerHTML = "";
 
-        slots.forEach((slot) => {
+        slots.forEach(slot => {
             const button = document.createElement("button");
             button.type = "button";
             button.className = "slot-btn";
             button.textContent = formatDateTime(slot);
 
             button.addEventListener("click", () => {
-                document.querySelectorAll(".slot-btn").forEach((btn) => {
+                document.querySelectorAll(".slot-btn").forEach(btn => {
                     btn.classList.remove("selected");
                 });
 
@@ -180,9 +219,7 @@ async function createBooking() {
     try {
         const response = await fetch(`${apiBase}/api/bookings`, {
             method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
+            headers: getHeaders(),
             body: JSON.stringify(payload)
         });
 
@@ -193,20 +230,16 @@ async function createBooking() {
             return;
         }
 
-            // скрываем форму
-            document.querySelector(".public-panel").style.display = "none";
+        document.querySelector(".public-panel").style.display = "none";
+        document.getElementById("successView").style.display = "block";
 
-            // показываем success
-            document.getElementById("successView").style.display = "block";
+        document.getElementById("successDate").textContent = formatDateTime(selectedSlotUtc);
 
-            // заполняем данные
-            document.getElementById("successDate").textContent = formatDateTime(selectedSlotUtc);
+        const selectedService = serviceSelect.options[serviceSelect.selectedIndex].text;
+        const selectedWorker = workerSelect.options[workerSelect.selectedIndex].text;
 
-            const selectedService = serviceSelect.options[serviceSelect.selectedIndex].text;
-            const selectedWorker = workerSelect.options[workerSelect.selectedIndex].text;
-
-            document.getElementById("successService").textContent = selectedService;
-            document.getElementById("successWorker").textContent = selectedWorker;
+        document.getElementById("successService").textContent = selectedService;
+        document.getElementById("successWorker").textContent = selectedWorker;
 
         clientNameInput.value = "";
         clientEmailInput.value = "";
@@ -250,8 +283,13 @@ function setDefaultDate() {
 }
 
 async function init() {
-    setDefaultDate();
-    await loadWorkers();
+    try {
+        setDefaultDate();
+        await loadBusiness();
+        await loadWorkers();
+    } catch {
+        showMessage("Nie udało się załadować strony rezerwacji.", true);
+    }
 }
 
 init();

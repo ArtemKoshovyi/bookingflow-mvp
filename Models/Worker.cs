@@ -12,4 +12,7 @@ public class Worker
 
     public List<Service> Services { get; set; } = new();
     public List<Booking> Bookings { get; set; } = new();
+
+    public int BusinessId { get; set; }
+    public Business? Business { get; set; }
 }
